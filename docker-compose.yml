@@ -1,0 +1,30 @@
+  version: '3.9'
+
+  services:
+    app:
+      build:
+        context: .  # Указывает путь к Dockerfile
+        dockerfile: Dockerfile
+      command: uvicorn warehouse_api.main:app --host 0.0.0.0 --port 8000
+      container_name: fastapi_app
+      ports:
+        - "8000:8000"  # Проброс порта для доступа к FastAPI
+      environment:
+        - DATABASE_URL=postgresql://postgres:Fy.nf@db:5432/postgres
+      depends_on:
+        - db  # Контейнер с FastAPI запускается после контейнера с PostgreSQL
+
+    db:
+      image: postgres:13 # Используем официальный образ PostgreSQL
+      container_name: postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: Fy.nf
+        POSTGRES_DB: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data  # Сохранение данных вне контейнера
+      ports:
+        - "5432:5432"  # Проброс порта PostgreSQL для локального доступа
+
+  volumes:
+    postgres_data:
